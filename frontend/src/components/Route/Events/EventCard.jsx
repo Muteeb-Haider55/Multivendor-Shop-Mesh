@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "../../../styles/styles";
-
+import CountDown from "./CountDown.jsx";
 const EventCard = () => {
   return (
-    <div className={` w-full bg-white block rounded-lg lg:flex p-2 `}>
-      <div className=" w-full lg:w-[50%] m-auto">
+    <div className={` w-full bg-white block rounded-lg 800px:flex p-2 mb-12`}>
+      <div className=" w-full  lg:w-[50%] m-auto">
         <img src="https://m.media-amazon.com/images/I/31Vle5fVdaL.jpg" alt="" />
       </div>
       <div className=" w-full lg:w-[50%] flex flex-col justify-center">
@@ -27,11 +27,16 @@ const EventCard = () => {
               999$
             </h5>
           </div>
-          <span className="text-[#4ade80] pr-3 font-[400] text-[17px] ">
-            120 sold
-          </span>
+          <div className=" rounded items-center  mt-2 mr-2 text-center  text-white bg-green-400 pr-3 font-[400] text-[17px] ">
+            <span
+              className=" ml-2
+            "
+            >
+              120 sold
+            </span>
+          </div>
         </div>
-        <div></div>
+        <CountDown />
       </div>
     </div>
   );
