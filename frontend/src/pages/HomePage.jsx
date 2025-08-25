@@ -5,6 +5,8 @@ import Categories from "../components/Route/Categories/Categories.jsx";
 import BestDeals from "../components/Route/BestDeals/BestDeals.jsx";
 import FeaturedProducts from "../components/Route/FeaturedProducts/FeaturedProducts.jsx";
 import Events from "../components/Route/Events/Events.jsx";
+import Sponserd from "../components/Route/Sponserd/Sponserd.jsx";
+import Footer from "../components/Layout/Footer/Footer.jsx";
 
 const HomePage = () => {
   return (
@@ -15,6 +17,8 @@ const HomePage = () => {
       <BestDeals />
       <Events />
       <FeaturedProducts />
+      <Sponserd />
+      <Footer />
     </div>
   );
 };
