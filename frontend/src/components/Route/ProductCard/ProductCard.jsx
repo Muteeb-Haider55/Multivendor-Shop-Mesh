@@ -11,7 +11,7 @@ import {
   AiOutlineStar,
 } from "react-icons/ai";
 
-const ProductCard = ({ data, key }) => {
+const ProductCard = ({ data }) => {
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
   const d = data.name;
@@ -110,9 +110,7 @@ const ProductCard = ({ data, key }) => {
             color="#444"
             title="Add to cart"
           />
-          {open ? (
-            <ProductDetailsCard setOpen={setOpen} data={data} />
-          ) : null}
+          {open ? <ProductDetailsCard setOpen={setOpen} data={data} /> : null}
         </div>
       </div>
     </>
