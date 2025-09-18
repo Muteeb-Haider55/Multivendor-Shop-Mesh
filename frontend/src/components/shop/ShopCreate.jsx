@@ -9,31 +9,39 @@ import { RxAvatar } from "react-icons/rx";
 
 const ShopCreate = () => {
   const navigate = useNavigate();
+  const config = { headers: { "Content-Type": "multipart/form-data" } };
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState();
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAddress] = useState("");
-  const [zipcode, setZipcode] = useState();
+  const [zipCode, setZipcode] = useState("");
   const [avatar, setAvatar] = useState();
-
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios
-      .post(
-        `${server}/user/login-user`,
-        {
-          email,
-          password,
-        },
-        { withCredentials: true }
-      )
+    const newForm = new FormData();
+    newForm.append("file", avatar);
+    newForm.append("name", name);
+    newForm.append("email", email);
+    newForm.append("password", password);
+    newForm.append("zipCode", zipCode);
+    newForm.append("address", address);
+    newForm.append("phoneNumber", phoneNumber);
+
+    axios
+      .post(`${server}/shop/create-shop`, newForm, config)
       .then((res) => {
-        toast.success("Login Successfully");
-        navigate("/");
-        window.location.reload(true);
+        toast.success(res.data.message);
+        setName("");
+        setEmail("");
+        setPassword("");
+        setAvatar();
+        setZipcode("");
+        setAddress("");
+        setPhoneNumber("");
       })
       .catch((err) => {
         toast.error(err.response.data.message);
@@ -143,7 +151,7 @@ const ShopCreate = () => {
                   type="number"
                   name="zipcode"
                   required
-                  value={zipcode}
+                  value={zipCode}
                   onChange={(e) => setZipcode(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -207,7 +215,7 @@ const ShopCreate = () => {
                   <span>Upload a file</span>
                   <input
                     type="file"
-                    name="avatar"
+                    name="file"
                     id="file-input"
                     accept=".jpg,.jpeg,.png"
                     className=" sr-only"
