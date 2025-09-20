@@ -36,7 +36,7 @@ router.post(
   })
 );
 
-// Get all product of a shop
+// Get all events of a shop
 router.get(
   "/get-all-events/:id",
   catchAsyncErrors(async (req, res, next) => {
@@ -85,4 +85,19 @@ router.delete(
   })
 );
 
+// get all events
+router.get(
+  "/get-all-events",
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const events = await Event.find();
+      res.status(201).json({
+        success: true,
+        events,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error, 400));
+    }
+  })
+);
 module.exports = router;
