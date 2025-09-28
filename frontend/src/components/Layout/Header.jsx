@@ -23,6 +23,12 @@ import { backend_url } from "../../../server.js";
 import { RxCross1 } from "react-icons/rx";
 
 const Header = ({ activeHeading }) => {
+  const { allProducts } = useSelector((state) => state.product);
+  const { cart } = useSelector((state) => state.cart);
+  const { wishlist } = useSelector((state) => state.wishlist);
+
+  const { isSeller } = useSelector((state) => state.seller);
+
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(null);
@@ -30,16 +36,18 @@ const Header = ({ activeHeading }) => {
   const [dropDown, setDropDown] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const [openWishlist, setOpenWishlist] = useState(false);
-  //for ,obile Header
+  //for mobile Header
   const [open, setOpen] = useState(false);
 
   const handleSearchChange = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
 
-    const filteredProducts = productData.filter((product) =>
-      product.name.toLowerCase().includes(term.toLowerCase())
-    );
+    const filteredProducts =
+      allProducts &&
+      allProducts.filter((product) =>
+        product.name.toLowerCase().includes(term.toLowerCase())
+      );
     setSearchData(filteredProducts);
   };
 
@@ -76,13 +84,11 @@ const Header = ({ activeHeading }) => {
             {searchData && searchData.length !== 0 ? (
               <div className=" absolute min-h-[30vh] bg-slate-50 shadow-sm-2  z-[9] p-4">
                 {searchData.map((i, index) => {
-                  const d = i.name;
-                  const Product_name = d.replace(/\s+/g, "-");
                   return (
-                    <Link to={`/products/${Product_name}`} key={index}>
+                    <Link to={`/products/${i._id}`} key={index}>
                       <div className="w-full flex items-start-py-3">
                         <img
-                          src={i.image_Url[0].url}
+                          src={`${backend_url}/${i.images[0]}`}
                           alt=""
                           className="w-[40px] h-[40px]"
                         />
@@ -95,11 +101,25 @@ const Header = ({ activeHeading }) => {
             ) : null}
           </div>
           <div className={`${styles.button} bg-green-500  !rounded-[4px]`}>
-            <Link to="/shop-create">
-              <h1 className=" text-[#fff] flex items-center">
-                Become Seller <IoIosArrowForward className="ml-1" />
-              </h1>
-            </Link>
+            {isSeller ? (
+              <Link to="/dashboard">
+                <div className={`${styles.button} m-auto !rounded-[4px]`}>
+                  <h1 className=" text-[#fff] flex items-center">
+                    Go DashBoard
+                    <IoIosArrowForward className="ml-1" />
+                  </h1>
+                </div>
+              </Link>
+            ) : (
+              <Link to="/shop-create">
+                <div className={`${styles.button} m-auto !rounded-[4px]`}>
+                  <h1 className=" text-[#fff] flex items-center">
+                    Become Seller
+                    <IoIosArrowForward className="ml-1" />
+                  </h1>
+                </div>
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -148,7 +168,7 @@ const Header = ({ activeHeading }) => {
                   color={"rgb(255 255 255 / 83%)"}
                 />
                 <span className=" absolute right-0 top-0 rounded-full bg-[#7e9c8b] w-4 h-4 p-0 m-0 text-white font-nano text-[12px] leading-tight text-center">
-                  0
+                  {wishlist && wishlist.length}
                 </span>
               </div>
               <div
@@ -160,7 +180,7 @@ const Header = ({ activeHeading }) => {
                   color={"rgb(255 255 255 / 83%)"}
                 />
                 <span className=" absolute right-0 top-0 rounded-full bg-[#7e9c8b] w-4 h-4 p-0 m-0 text-white font-nano text-[12px] leading-tight text-center">
-                  0
+                  {cart?.length}
                 </span>
               </div>
               <div className="relative cursor-pointer mr-[15px]">
@@ -194,7 +214,7 @@ const Header = ({ activeHeading }) => {
           <div className=" relative ml-4">
             <AiOutlineShoppingCart size={30} />
             <span className=" absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 p-0 m-0 text-white font-nano text-[12px] leading-tight text-center">
-              0
+              {cart && cart.length}
             </span>
           </div>
           <div className=" ">
@@ -273,13 +293,25 @@ const Header = ({ activeHeading }) => {
                 ) : null}
               </div>
               <Navbar active={activeHeading} />
-              <Link to="/shop-create">
-                <div className={`${styles.button} m-auto !rounded-[4px]`}>
-                  <h1 className=" text-[#fff] flex items-center">
-                    Become Seller <IoIosArrowForward className="ml-1" />
-                  </h1>
-                </div>
-              </Link>
+              {isSeller ? (
+                <Link to="/dashboard">
+                  <div className={`${styles.button} m-auto !rounded-[4px]`}>
+                    <h1 className=" text-[#fff] flex items-center">
+                      Go DashBoard
+                      <IoIosArrowForward className="ml-1" />
+                    </h1>
+                  </div>
+                </Link>
+              ) : (
+                <Link to="/shop-create">
+                  <div className={`${styles.button} m-auto !rounded-[4px]`}>
+                    <h1 className=" text-[#fff] flex items-center">
+                      Become Seller
+                      <IoIosArrowForward className="ml-1" />
+                    </h1>
+                  </div>
+                </Link>
+              )}
               <br />
 
               <div

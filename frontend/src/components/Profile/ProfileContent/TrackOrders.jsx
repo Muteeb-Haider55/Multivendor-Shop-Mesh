@@ -1,29 +1,28 @@
-import { Button } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import React from "react";
-import { MdOutlineTrackChanges } from "react-icons/md";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
+import { MdOutlineTrackChanges } from "react-icons/md";
 
+import { DataGrid } from "@mui/x-data-grid";
+import Loader from "../../Layout/Loader";
+import { getAllOrderOfUser } from "../../../redux/actions/order";
 const TrackOrders = () => {
-  const orders = [
-    {
-      _id: "ndNADKNKDUOEOQJE921EN",
-      orderItems: [
-        {
-          name: "Iphone 14 pro max",
-        },
-      ],
-      totalPrice: 120,
-      orderStatus: "Processing",
-    },
-  ];
+  const { user } = useSelector((state) => state.user);
+  const { orders, isLoading } = useSelector((state) => state.orders);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllOrderOfUser(user._id));
+  }, [dispatch]);
+
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
 
     {
       field: "status",
       headerName: "Status",
-      minWidth: 130,
+      minWidth: 100,
       flex: 0.7,
       cellClassName: (params) => {
         return params.value === "Delivered" ? "greenColor" : "redColor";
@@ -33,7 +32,7 @@ const TrackOrders = () => {
       field: "itemsQty",
       headerName: "Items Qty",
       type: "number",
-      minWidth: 130,
+      minWidth: 100,
       flex: 0.7,
     },
 
@@ -46,16 +45,16 @@ const TrackOrders = () => {
     },
 
     {
-      field: " ",
+      field: "action",
       flex: 1,
-      minWidth: 130,
+      minWidth: 110,
       headerName: "",
       type: "number",
       sortable: false,
       renderCell: (params) => {
         return (
           <>
-            <Link to={`/user/order/${params.id}`}>
+            <Link to={`/user/track/order/${params.id}`}>
               <Button>
                 <MdOutlineTrackChanges size={20} />
               </Button>
@@ -65,26 +64,34 @@ const TrackOrders = () => {
       },
     },
   ];
+
   const row = [];
+
   orders &&
     orders.forEach((item) => {
       row.push({
         id: item._id,
-        itemsQty: item.orderItems.length,
+        itemsQty: item.cart.length,
         total: "US$ " + item.totalPrice,
-        status: item.orderStatus,
+        status: item.status,
       });
     });
   return (
-    <div className=" pl-8 pt-1">
-      <DataGrid
-        rows={row}
-        columns={columns}
-        pageSize={10}
-        disableSelectionOnClick
-        autoHeight
-      />
-    </div>
+    <>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <div className="w-full mx-8 pt-1 mt-10 bg-white">
+          <DataGrid
+            rows={row}
+            columns={columns}
+            pageSize={10}
+            disableSelectionOnClick
+            autoHeight
+          />
+        </div>
+      )}
+    </>
   );
 };
 

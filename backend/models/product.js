@@ -27,6 +27,25 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, "please enter product stock"],
   },
+  reviews: [
+    {
+      user: {
+        type: Object,
+      },
+      rating: {
+        type: Number,
+      },
+      comment: {
+        type: String,
+      },
+      productId: {
+        type: String,
+      },
+    },
+  ],
+  ratings: {
+    type: Number,
+  },
   images: [
     {
       type: String,

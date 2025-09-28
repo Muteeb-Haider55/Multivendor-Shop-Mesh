@@ -27,12 +27,10 @@ const AllEvents = () => {
     { field: "price", headerName: "Price", minWidth: 100, flex: 0.6 },
     { field: "stock", headerName: "Stock ", minWidth: 80, flex: 0.5 },
     { field: "sold", headerName: "Sold", minWidth: 130, flex: 0.6 },
-    { field: "start-date", headerName: "Start", minWidth: 130, flex: 0.6 },
-    { field: "end-date", headerName: "End", minWidth: 130, flex: 0.6 },
 
     {
       field: "preview",
-      headerName: "",
+      headerName: "Preview",
       minWidth: 100,
       flex: 0.8,
       type: "number",
@@ -54,7 +52,7 @@ const AllEvents = () => {
 
     {
       field: "Delete",
-      headerName: "",
+      headerName: "Delete",
       minWidth: 120,
       flex: 0.8,
       type: "number",
@@ -79,8 +77,6 @@ const AllEvents = () => {
         price: "US$ " + item.discountPrice,
         stock: item.stock,
         sold: 10,
-        start_date: item.start_date,
-        finish: item.finish_date,
       });
     });
   return (

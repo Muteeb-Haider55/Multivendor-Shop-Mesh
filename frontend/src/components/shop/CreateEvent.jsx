@@ -49,7 +49,7 @@ const CreateEvent = () => {
     }
     if (success) {
       toast.success("Event Created SuccessFully");
-      window.location.reload();
+      // window.location.reload();
     }
   }, [dispatch, error, success]);
 

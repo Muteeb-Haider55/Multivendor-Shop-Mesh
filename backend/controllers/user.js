@@ -9,6 +9,7 @@ const sendMail = require("../utils/sendMail.js");
 const catchAsyncErrors = require("../middlware/catchAsyncErrors.js");
 const sendToken = require("../utils/jwtToken.js");
 const { isAuthenticated } = require("../middlware/auth.js");
+
 const router = express.Router();
 router.post("/create-user", upload.single("file"), async (req, res, next) => {
   try {
@@ -139,19 +140,169 @@ router.get(
   })
 );
 //Logout user
-router.get('/logout', isAuthenticated, catchAsyncErrors(async(req, res, next)=>{
-try {
-  res.cookie("token", null, {
-    expires:new Date(Date.now()),
-    httpOnly:true
-  });
-  res.status(201).json({
-    success:true,
-    message:"Log Out Successful"
-  })
-} catch (error) {
+router.get(
+  "/logout",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      res.cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      });
+      res.status(201).json({
+        success: true,
+        message: "Log Out Successful",
+      });
+    } catch (error) {
       return next(new ErrorHandler(error.message, 500));
-  
-}
-}))
+    }
+  })
+);
+// update user info
+router.put(
+  "/update-user-info",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const { email, password, phoneNumber, name } = req.body;
+      const user = await User.findOne({ email }).select("+password");
+      if (!user) {
+        return next(new ErrorHandler("user not found", 500));
+      }
+      const isPasswordValid = await user.comparePassword(password);
+      if (isPasswordValid) {
+        user.name = name;
+        user.email = email;
+        user.phoneNumber = phoneNumber;
+        await user.save();
+        res.status(201).json({
+          success: true,
+          user,
+        });
+      } else {
+        return next(new ErrorHandler("Please provide the correct Info", 400));
+      }
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+// update user avatar
+router.put(
+  "/update-avatar",
+  isAuthenticated,
+  upload.single("image"),
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const existUser = await User.findById(req.user.id);
+      const existAvatarPath = `uploads/${existUser.avatar.public_id}`;
+      fs.unlink(existAvatarPath);
+
+      const fileUrl = path.join(req.file.filename);
+      const user = await User.findByIdAndUpdate(req.user.id, {
+        avatar: {
+          public_id: req.file.filename,
+          url: `/uploads/${req.file.filename}`,
+        },
+      });
+      res.status(200).json({ success: true, user });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+// update user address
+router.put(
+  "/update-user-address",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id);
+      const sameTypeAddress = user.addresses.find(
+        (address) => address.addressType === req.body.addressType
+      );
+      if (sameTypeAddress) {
+        return next(
+          new ErrorHandler(
+            `${req.body.addressType} Address already exists`,
+            400
+          )
+        );
+      }
+      const existAddress = user.addresses.find(
+        (address) => address._id === req.body._id
+      );
+      if (existAddress) {
+        Object.assign(existAddress, req.body);
+      } else {
+        // add the new address to the array
+        user.addresses.push(req.body);
+      }
+      await user.save();
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+// delet user address
+router.delete(
+  "/delete-user-address/:id",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const userId = req.user._id;
+      const addressId = req.params.id;
+
+      await User.updateOne(
+        {
+          _id: userId,
+        },
+        {
+          $pull: { addresses: { _id: addressId } },
+        }
+      );
+      const user = await User.findById(userId);
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
+
+// Update user password
+router.put(
+  "/update-user-password",
+  isAuthenticated,
+  catchAsyncErrors(async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id).select("+password");
+      const isPasswordMatched = await user.comparePassword(
+        req.body.oldPassword
+      );
+      if (!isPasswordMatched) {
+        return next(new ErrorHandler("Old password is incorrect", 400));
+      }
+      if (req.body.newPassword !== req.body.confirmPassword) {
+        return next(
+          new ErrorHandler("Password don't matched with each other", 400)
+        );
+      }
+      user.password = req.body.newPassword;
+      await user.save();
+      res.status(200).json({
+        success: true,
+        message: "Password Updated Successfully",
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  })
+);
 module.exports = router;

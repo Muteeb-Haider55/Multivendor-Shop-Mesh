@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
@@ -7,7 +7,6 @@ import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import { DataGrid } from "@mui/x-data-grid";
 import { deleteProduct, getAllProductsShop } from "../../redux/actions/product";
 import Loader from "../Layout/Loader";
-
 const AllProducts = () => {
   const handleDelete = (id) => {
     dispatch(deleteProduct(id));
@@ -29,7 +28,7 @@ const AllProducts = () => {
     { field: "sold", headerName: "Sold", minWidth: 130, flex: 0.6 },
     {
       field: "preview",
-      headerName: "",
+      headerName: "Preview",
       minWidth: 100,
       flex: 0.8,
       type: "number",
@@ -51,7 +50,7 @@ const AllProducts = () => {
 
     {
       field: "Delete",
-      headerName: "",
+      headerName: "Delete",
       minWidth: 120,
       flex: 0.8,
       type: "number",

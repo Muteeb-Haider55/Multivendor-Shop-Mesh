@@ -1,11 +1,20 @@
-import React, { useState } from "react";
-import { productData } from "../../static/data";
+import React, { useEffect, useState } from "react";
 import ProductCard from "../Route/ProductCard/ProductCard";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styles from "../../styles/styles";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProductsShop } from "../../redux/actions/product";
 
 const ShopProfileData = ({ isOwner }) => {
+  const { products } = useSelector((state) => state.product);
+  const { events } = useSelector((state) => state.events);
+  const { id } = useParams();
+  const dispatch = useDispatch();
   const [active, setActive] = useState(1);
+  useEffect(() => {
+    dispatch(getAllProductsShop(id));
+  }, [dispatch]);
+  console.log(products);
   return (
     <div className=" w-full ">
       <div className=" w-full flex items-center justify-between ">
@@ -40,10 +49,17 @@ const ShopProfileData = ({ isOwner }) => {
         </div>
         <div>
           {isOwner && (
-            <div className="">
+            <div className="flex">
               <Link to="/dashboard">
                 <div className={`${styles.button} !rounded-[4px] !h-[42px]`}>
                   <span className=" text-white">Go Dashboard</span>
+                </div>
+              </Link>
+              <Link to={`/`}>
+                <div
+                  className={`${styles.button} !rounded-[4px] !h-[42px]  ml-1`}
+                >
+                  <span className="text-white">Back to Home</span>
                 </div>
               </Link>
             </div>
@@ -51,12 +67,22 @@ const ShopProfileData = ({ isOwner }) => {
         </div>
       </div>
       <br />
-      <div className=" grid grid-cols-1 gap-[20] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
-        {productData &&
-          productData.map((i, index) => (
-            <ProductCard data={i} key={index} isShop={true} />
-          ))}
-      </div>
+      {active == 1 ? (
+        <div className=" grid grid-cols-1 gap-[20] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
+          {products &&
+            products.map((i, index) => (
+              <ProductCard data={i} key={index} isShop={true} />
+            ))}
+        </div>
+      ) : null}
+      {active == 2 ? (
+        <div className=" grid grid-cols-1 gap-[20] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
+          {events &&
+            events.map((i, index) => (
+              <ProductCard data={i} key={index} isShop={true} />
+            ))}
+        </div>
+      ) : null}
     </div>
   );
 };
