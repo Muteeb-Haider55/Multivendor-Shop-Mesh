@@ -4,17 +4,25 @@ import { Link, useParams } from "react-router-dom";
 import styles from "../../styles/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProductsShop } from "../../redux/actions/product";
+import { backend_url } from "../../../server";
+import Rating from "../Products/Rating";
+import { getAllEventsShop } from "../../redux/actions/event";
 
 const ShopProfileData = ({ isOwner }) => {
   const { products } = useSelector((state) => state.product);
   const { events } = useSelector((state) => state.events);
+  const { seller } = useSelector((state) => state.seller);
+
   const { id } = useParams();
   const dispatch = useDispatch();
   const [active, setActive] = useState(1);
   useEffect(() => {
     dispatch(getAllProductsShop(id));
+    dispatch(getAllEventsShop(seller._id));
   }, [dispatch]);
-  console.log(products);
+  const allReviews =
+    products && products.map((product) => product.reviews).flat();
+  console.log(events);
   return (
     <div className=" w-full ">
       <div className=" w-full flex items-center justify-between ">
@@ -67,22 +75,48 @@ const ShopProfileData = ({ isOwner }) => {
         </div>
       </div>
       <br />
-      {active == 1 ? (
+      {active == 1 && (
         <div className=" grid grid-cols-1 gap-[20] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
           {products &&
             products.map((i, index) => (
               <ProductCard data={i} key={index} isShop={true} />
             ))}
         </div>
-      ) : null}
-      {active == 2 ? (
+      )}
+
+      {active == 2 && (
         <div className=" grid grid-cols-1 gap-[20] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] xl:grid-cols-4 xl:gap-[20px] mb-12 border-0">
           {events &&
             events.map((i, index) => (
-              <ProductCard data={i} key={index} isShop={true} />
+              <ProductCard data={i} key={index} isShop={true} isEvent={true} />
             ))}
         </div>
-      ) : null}
+      )}
+
+      {active == 3 && (
+        <div className="w-full">
+          {allReviews &&
+            allReviews.map((item, index) => (
+              <div className=" w-full flex my-3">
+                <img
+                  src={`${backend_url}/${item.user.avatar.public_id}`}
+                  className="w-[50px] h-[50px] rounded-full"
+                  alt=""
+                />
+                <div className="pl-2">
+                  <div className=" w-full flex items-center">
+                    <h1 className="font-[600] pr-2">{item.user.name}</h1>
+                    <Rating ratings={item.rating} />
+                  </div>
+                  <p className="font-[400] text-[#0000005d]">{item?.comment}</p>
+                  <p className=" text-[#000000a7]">
+                    {item.createdAt || "2 days ago"}
+                  </p>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -8,7 +8,7 @@ import AllRefundOrders from "../Profile/ProfileContent/AllRefundOrders.jsx";
 import TrackOrders from "../Profile/ProfileContent/TrackOrders.jsx";
 import ChangePassword from "../Profile/ProfileContent/ChangePassword.jsx";
 import Address from "../Profile/ProfileContent/Address.jsx";
-import { updateUserInformation } from "../../redux/actions/user.js";
+import { loadUser, updateUserInformation } from "../../redux/actions/user.js";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -19,7 +19,7 @@ const ProfileContent = ({ active }) => {
   const [email, setEmail] = useState(user && user.email);
   const [phoneNumber, setPhoneNumber] = useState(user && user.phoneNumber);
   const [password, setPassword] = useState("");
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState();
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
@@ -40,7 +40,7 @@ const ProfileContent = ({ active }) => {
     const file = e.target.files[0];
     setAvatar(file);
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("image", e.target.files[0]);
 
     await axios
       .put(`${server}/user/update-avatar`, formData, {
@@ -50,10 +50,11 @@ const ProfileContent = ({ active }) => {
         withCredentials: true,
       })
       .then((res) => {
-        window.location.reload();
+        dispatch(loadUser());
+        toast.success("Image updated successfully");
       })
       .catch((error) => {
-        toast.error(error);
+        toast.error(error.response.data.message);
       });
   };
 
@@ -65,7 +66,11 @@ const ProfileContent = ({ active }) => {
           <div className="flex justify-center w-full">
             <div className="relative">
               <img
-                src={`${backend_url}/${user?.avatar?.public_id}`}
+                src={
+                  avatar
+                    ? URL.createObjectURL(avatar)
+                    : `${backend_url}/${user?.avatar?.public_id}`
+                }
                 alt=""
                 className=" w-[150px] h-[150px] rounded-full object-cover border-[3px] border-[#3ad132]"
               />

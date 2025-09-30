@@ -31,21 +31,21 @@ const EventCard = ({ active, data }) => {
     >
       <div className=" w-full  lg:w-[50%] m-auto">
         <img
-          src={`${backend_url}/${data.images[0]}`}
+          src={`${backend_url}/${data?.images[0]}`}
           className="800px:w-[2000px] 800px:max-h-[450px] rounded-[20px] p-4"
           alt=""
         />
       </div>
       <div className=" w-full lg:w-[50%] flex flex-col justify-center">
-        <h2 className={`${styles.productTitle} `}> {data.name}</h2>
-        <p>{data.description}</p>
+        <h2 className={`${styles.productTitle} `}> {data?.name}</h2>
+        <p>{data?.description}</p>
         <div className="flex py-2 justify-between">
           <div className="flex">
             <h5 className=" font-[500] text-[18px] text-[#d55b45] pr-3 line-through">
-              {data.discountPrice}
+              {data?.discountPrice}
             </h5>
             <h5 className=" font-bold text-[20px] font-Roboto text-[#333]">
-              {data.originalPrice}
+              {data?.originalPrice}
             </h5>
           </div>
           <div className=" rounded items-center  mt-2 mr-2 text-center  text-white bg-green-400 pr-3 font-[400] text-[17px] ">
@@ -57,10 +57,11 @@ const EventCard = ({ active, data }) => {
             </span>
           </div>
         </div>
+
         <CountDown data={data} />
         <br />
         <div className=" flex items-center ">
-          <Link to={`/products/${data._id}?isEvent=true`}>
+          <Link to={`/products/${data?._id}?isEvent=true`}>
             <div className={`${styles.button} text-white !rounded-[4px]`}>
               See Details
             </div>

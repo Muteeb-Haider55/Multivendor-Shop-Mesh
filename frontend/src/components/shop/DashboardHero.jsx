@@ -15,14 +15,18 @@ const DashboardHero = () => {
   const { orders } = useSelector((state) => state.orders);
   const { seller } = useSelector((state) => state.seller);
   const { products } = useSelector((state) => state.product);
-  const [deliveredOrders, setDeliveredOrders] = useState("");
+  const [deliveredOrders, setDeliveredOrders] = useState();
   useEffect(() => {
     dispatch(getAllOrderOfShop(seller._id));
     dispatch(getAllProductsShop(seller._id));
-    const orderData =
-      orders && orders.filter((item) => item.status === "Delivered");
-    setDeliveredOrders(orderData);
-  }, [dispatch]);
+  }, [dispatch, seller._id]);
+  useEffect(() => {
+    if (orders) {
+      const orderData =
+        orders && orders.filter((item) => item.status === "Delivered");
+      setDeliveredOrders(orderData);
+    }
+  }, [orders]);
   console.log(deliveredOrders);
   const totalEarningWithoutTax =
     deliveredOrders &&

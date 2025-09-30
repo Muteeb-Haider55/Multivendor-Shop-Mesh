@@ -41,6 +41,10 @@ const productSchema = new mongoose.Schema({
       productId: {
         type: String,
       },
+      createdAt: {
+        type: Date,
+        default: Date.now(),
+      },
     },
   ],
   ratings: {

@@ -4,17 +4,23 @@ import { backend_url, server } from "../../../server";
 
 import styles from "../../styles/styles";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Loader from "../Layout/Loader";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProductsShop } from "../../redux/actions/product";
 
 const ShopInfo = ({ isOwner }) => {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const { products } = useSelector((state) => state.product);
 
   const { id } = useParams();
   const dispatch = useDispatch();
+
   useEffect(() => {
+    dispatch(getAllProductsShop(id));
+
+    setIsLoading(true);
     axios
       .get(`${server}/shop/get-shop-info/${id}`)
       .then((res) => {
@@ -30,6 +36,19 @@ const ShopInfo = ({ isOwner }) => {
     await axios.get(`${server}/shop/logout`, { withCredentials: true });
     window.location.reload();
   };
+
+  const totalReviewsLength =
+    products &&
+    products.reduce((acc, product) => acc + product.reviews.length, 0);
+  const totalRatings =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
+      0
+    );
+  const averageRating = totalRatings / totalReviewsLength || 0;
+
   return (
     <>
       {isLoading ? (
@@ -58,12 +77,12 @@ const ShopInfo = ({ isOwner }) => {
             <h4 className=" text-[#0000006a]">{data.phoneNumber}</h4>
           </div>
           <div className=" p-3 ">
-            <h5 className="font-[600]">Total data</h5>
-            <h4 className=" text-[#0000006a]">10</h4>
+            <h5 className="font-[600]">Total products</h5>
+            <h4 className=" text-[#0000006a]">{products?.length}</h4>
           </div>
           <div className=" p-3 ">
-            <h5 className="font-[600]">Shp Rating</h5>
-            <h4 className=" text-[#0000006a]">4/5</h4>
+            <h5 className="font-[600]">Shop Rating</h5>
+            <h4 className=" text-[#0000006a]">{averageRating}/5</h4>
           </div>
           <div className=" p-3 ">
             <h5 className="font-[600]">Joined On</h5>
@@ -73,11 +92,13 @@ const ShopInfo = ({ isOwner }) => {
           </div>
           {isOwner && (
             <div className=" py-3 px-4 ">
-              <div
-                className={`${styles.button} !w-full !h-[42px] !rounded-[5px]`}
-              >
-                <span className=" text-white">Edit Shop</span>
-              </div>
+              <Link to="/dashboard-profile-setting">
+                <div
+                  className={`${styles.button} !w-full !h-[42px] !rounded-[5px]`}
+                >
+                  <span className=" text-white">Edit Shop</span>
+                </div>
+              </Link>
               <div
                 className={`${styles.button} bg-red-500 !w-full !h-[42px] !rounded-[5px]`}
                 onClick={logoutHandler}

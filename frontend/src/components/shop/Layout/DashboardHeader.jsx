@@ -20,7 +20,7 @@ const DashboardHeader = () => {
       </div>
       <div className="flex item-center">
         <div className="flex item-center mr-4 mt-3">
-          <Link to="/dashboard/cupouns" className="800px:block hidden">
+          <Link to="/dashboard-coupouns" className="800px:block hidden">
             <AiOutlineGift color="#555" size={30} className="cursor-pointer" />
           </Link>
           <Link to="/dashboard-events" className="800px:block hidden">
@@ -44,7 +44,7 @@ const DashboardHeader = () => {
               className=" cursor-pointer ml-4"
             />
           </Link>
-          <Link to="/dashboard-products" className="800px:block hidden">
+          <Link to="/dashboard-messages" className="800px:block hidden">
             <BiMessageSquareDetail
               color="#555"
               size={30}

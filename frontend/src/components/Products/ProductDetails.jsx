@@ -7,7 +7,7 @@ import {
   AiOutlineMessage,
   AiOutlineShoppingCart,
 } from "react-icons/ai";
-import { backend_url } from "../../../server";
+import { backend_url, server } from "../../../server";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts } from "../../redux/actions/product";
 import {
@@ -17,13 +17,15 @@ import {
 import { toast } from "react-toastify";
 import { addToCart } from "../../redux/actions/cart";
 import Rating from "./Rating";
-import { all } from "axios";
+import axios from "axios";
 
 const ProductDetails = ({ data }) => {
   const { allProducts } = useSelector((state) => state.product);
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
   const { products } = useSelector((state) => state.product);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -41,9 +43,7 @@ const ProductDetails = ({ data }) => {
   const incrementCount = () => {
     setCount(count + 1);
   };
-  const handleMessageSubmit = () => {
-    navigate("/inbox?conversation=507jkHSKJskj");
-  };
+
   const addToCartHandler = (id) => {
     const isItemExist = cart && cart.find((i) => i._id === id);
     if (isItemExist) {
@@ -87,6 +87,32 @@ const ProductDetails = ({ data }) => {
     );
   const averageRating = totalRatings / totalReviewsLength || 0;
 
+  const handleMessageSubmit = async () => {
+    console.log(isAuthenticated);
+    if (isAuthenticated) {
+      const groupTitle = data._id + user._id;
+      const userId = user._id;
+      const sellerId = data.shop._id;
+      axios
+        .post(
+          `${server}/conversation/create-new-conversation`,
+          {
+            groupTitle,
+            userId,
+            sellerId,
+          },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          navigate(`/conversation/${res.data.conversation._id}`);
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message);
+        });
+    } else {
+      toast.error("Please login to create conversation");
+    }
+  };
   return (
     <div className=" bg-white ">
       {data ? (

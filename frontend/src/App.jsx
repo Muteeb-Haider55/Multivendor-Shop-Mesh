@@ -33,6 +33,9 @@ import {
   ShopAllOrders,
   ShopOrderDetails,
   ShopAllRefunds,
+  ShopSettingsPage,
+  ShopWithdrawMoneyPage,
+  ShopInboxPage,
 } from "./routes/ShopRoutes.js";
 
 import { ToastContainer } from "react-toastify";
@@ -146,6 +149,14 @@ const App = () => {
             }
           />
           <Route
+            path="/dashboard-profile-setting"
+            element={
+              <SellerProtectedRoute>
+                <ShopSettingsPage />
+              </SellerProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <SellerProtectedRoute>
@@ -222,7 +233,25 @@ const App = () => {
               </SellerProtectedRoute>
             }
           />
+
+          <Route
+            path="/dashboard-withdraw-money"
+            element={
+              <SellerProtectedRoute>
+                <ShopWithdrawMoneyPage />
+              </SellerProtectedRoute>
+            }
+          />
           <Route path="/shop/preview/:id" element={<ShopPreviewPage />} />
+
+          <Route
+            path="/dashboard-messages"
+            element={
+              <SellerProtectedRoute>
+                <ShopInboxPage />
+              </SellerProtectedRoute>
+            }
+          />
         </Routes>
 
         <ToastContainer
