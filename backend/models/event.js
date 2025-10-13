@@ -41,7 +41,12 @@ const eventSchema = new mongoose.Schema({
   },
   images: [
     {
-      type: String,
+      public_id: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
     },
   ],
   shopId: {

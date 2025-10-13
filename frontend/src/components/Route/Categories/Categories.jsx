@@ -9,15 +9,19 @@ const Categories = () => {
     <>
       <div className={`${styles.section} hidden sm:block`}>
         <div
-          className={` my-12 flex justify-between w-full shadow-sm bg-white p-5 rounded-md`}
+          className={`w-full flex justify-between   shadow-sm bg-white p-5 rounded-md mb-5  mt-5`}
         >
           {brandingData &&
             brandingData.map((i, index) => (
-              <div className="flex items-start" key={index}>
-                {i.icon}
-                <div className="px-3">
-                  <h3 className="font-bold text-sm md:text-base">{i.title}</h3>
-                  <p className="text-xs md:text-sm">{i.Description}</p>
+              <div className={`   shadow-sm bg-white p-5 rounded-md ml-2`}>
+                <div className="flex items-start" key={index}>
+                  {i.icon}
+                  <div className="px-3">
+                    <h3 className="font-bold text-sm md:text-base">
+                      {i.title}
+                    </h3>
+                    <p className="text-xs md:text-sm">{i.Description}</p>
+                  </div>
                 </div>
               </div>
             ))}

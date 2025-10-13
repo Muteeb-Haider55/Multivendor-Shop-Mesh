@@ -72,7 +72,13 @@ const ProductCard = ({ data, isEvent }) => {
           }`}
         >
           <img
-            src={`${backend_url}/${data.images[0]}`}
+            src={
+              data?.images && data.images[0]
+                ? typeof data.images[0] === "string"
+                  ? `${backend_url}/${data.images[0]}`
+                  : data.images[0].url
+                : ""
+            }
             alt=""
             className="w-full h-[170px] object-contain"
           />

@@ -25,12 +25,7 @@ const CreateProduct = () => {
     if (error) {
       toast.error(error);
     }
-    if (success) {
-      toast.success("Product Created SuccessFully");
-
-      window.location.reload();
-    }
-  }, [dispatch, error, success]);
+  }, [error]);
 
   const handleImageChange = (e) => {
     e.preventDefault();
@@ -52,6 +47,10 @@ const CreateProduct = () => {
     newForm.append("stock", stock);
     newForm.append("shopId", seller._id);
     dispatch(createProduct(newForm));
+    if (success === true) {
+      toast.success("Product created successfully");
+      navigate("/dashboard-products");
+    }
   };
 
   return (

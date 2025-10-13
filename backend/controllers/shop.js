@@ -11,6 +11,7 @@ const ErrorHandler = require("../utils/ErrorHandler.js");
 const Shop = require("../models/shop.js");
 const catchAsyncErrors = require("../middlware/catchAsyncErrors.js");
 const sendShopToken = require("../utils/shopToken.js");
+const { uploadBuffer, deleteByPublicId } = require("../utils/cloudinary.js");
 
 //for register a new shop
 router.post("/create-shop", upload.single("file"), async (req, res, next) => {
@@ -18,24 +19,27 @@ router.post("/create-shop", upload.single("file"), async (req, res, next) => {
     const { email } = req.body;
     const sellerEmail = await Shop.findOne({ email });
     if (sellerEmail) {
-      const filename = req.file.filename;
-      const filepath = `uploads/${filename}`;
-      fs.unlink(filepath, (err) => {
-        if (err) {
-          console.log(err);
-          res.status(500).json({ message: "Error deleting file" });
-        }
-      });
       return next(new ErrorHandler("Shop Already Exist", 400));
     }
-    const filename = req.file.filename;
-    const fileUrl = path.join(filename);
+
+    let avatar = null;
+    if (req.file) {
+      /* CLOUDINARY UPLOAD START - user avatar */
+      try {
+        const result = await uploadBuffer(req.file.buffer, "shops");
+        avatar = { public_id: result.public_id, url: result.secure_url };
+      } catch (err) {
+        console.error("Cloudinary upload error (create-shop):", err);
+        return next(new ErrorHandler("Image upload failed", 500));
+      }
+      /* CLOUDINARY UPLOAD END - user avatar */
+    }
 
     const seller = {
       name: req.body.name,
       email: email,
       password: req.body.password,
-      avatar: fileUrl,
+      avatar: avatar,
       address: req.body.address,
       phoneNumber: req.body.phoneNumber,
       zipCode: req.body.zipCode,
@@ -191,13 +195,41 @@ router.put(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const existUser = await Shop.findById(req.seller._id);
-      const existAvatarPath = `uploads/${existUser.avatar}`;
-      fs.unlinkSync(existAvatarPath);
+      // Delete previous avatar from Cloudinary if present
+      if (existUser && existUser.avatar && existUser.avatar.public_id) {
+        /* CLOUDINARY DELETE START - old user avatar */
+        try {
+          await deleteByPublicId(existUser.avatar.public_id);
+        } catch (err) {
+          console.error("Cloudinary delete error (update-avatar):", err);
+          // proceed even if deletion fails
+        }
+        /* CLOUDINARY DELETE END - old user avatar */
+      }
 
-      const fileUrl = path.join(req.file.filename);
-      const shop = await Shop.findByIdAndUpdate(req.seller._id, {
-        avatar: fileUrl,
-      });
+      if (!req.file) return next(new ErrorHandler("No image provided", 400));
+
+      /* CLOUDINARY UPLOAD START - new user avatar */
+      let uploaded;
+      try {
+        uploaded = await uploadBuffer(req.file.buffer, "shops");
+      } catch (err) {
+        console.error("Cloudinary upload error (update-avatar):", err);
+        return next(new ErrorHandler("Image upload failed", 500));
+      }
+      /* CLOUDINARY UPLOAD END - new user avatar */
+
+      const shop = await Shop.findByIdAndUpdate(
+        req.seller._id,
+        {
+          avatar: {
+            public_id: uploaded.public_id,
+            url: uploaded.secure_url,
+          },
+        },
+        { new: true }
+      );
+
       res.status(200).json({ success: true, shop });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));

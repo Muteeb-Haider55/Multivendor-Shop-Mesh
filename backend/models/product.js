@@ -52,8 +52,13 @@ const productSchema = new mongoose.Schema({
   },
   images: [
     {
-      type: String,
-      required: [true, "selct ateast 1 product image"],
+      public_id: {
+        type: String,
+      },
+      url: {
+        type: String,
+        required: [true, "selct ateast 1 product image"],
+      },
     },
   ],
   shopId: {

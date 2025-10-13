@@ -23,7 +23,7 @@ const ShopCreate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newForm = new FormData();
-    newForm.append("file", avatar);
+    if (avatar) newForm.append("file", avatar);
     newForm.append("name", name);
     newForm.append("email", email);
     newForm.append("password", password);

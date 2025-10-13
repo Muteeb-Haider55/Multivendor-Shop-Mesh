@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const { upload } = require("../multer.js");
+const { uploadBuffer, deleteByPublicId } = require("../utils/cloudinary.js");
 const User = require("../models/user.js");
 const jwt = require("jsonwebtoken");
 const ErrorHandler = require("../utils/ErrorHandler.js");
@@ -16,30 +17,28 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
     const { name, email, password } = req.body;
     const userEmail = await User.findOne({ email });
     if (userEmail) {
-      const filename = req.file.filename;
-      const filePath = `uploads/${filename}`;
-      fs.unlink(filePath, (err) => {
-        if (err) {
-          console.log(err);
-          res.status(500).json({
-            message: "Error deleting file",
-          });
-        }
-      });
+      // If a file was uploaded to memory, nothing was written to disk, so nothing to clean up here.
       return next(new ErrorHandler("User already exist", 400));
     }
-    const filename = req.file.filename;
-    const fileUrl = path.join(filename);
+
+    let avatar = null;
+    if (req.file) {
+      /* CLOUDINARY UPLOAD START - user avatar */
+      try {
+        const result = await uploadBuffer(req.file.buffer, "users");
+        avatar = { public_id: result.public_id, url: result.secure_url };
+      } catch (err) {
+        console.error("Cloudinary upload error (create-user):", err);
+        return next(new ErrorHandler("Image upload failed", 500));
+      }
+      /* CLOUDINARY UPLOAD END - user avatar */
+    }
 
     const user = {
       name: name,
       email: email,
       password: password,
-      // avatar: fileUrl,
-      avatar: {
-        public_id: req.file.filename,
-        url: `/uploads/${req.file.filename}`,
-      },
+      avatar: avatar,
     };
     const activationToken = createActivationToken(user);
     const activationUrl = `http://localhost:5173/activation/${activationToken}`;
@@ -195,16 +194,42 @@ router.put(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const existUser = await User.findById(req.user.id);
-      const existAvatarPath = `uploads/${existUser.avatar.public_id}`;
-      fs.unlink(existAvatarPath);
 
-      const fileUrl = path.join(req.file.filename);
-      const user = await User.findByIdAndUpdate(req.user.id, {
-        avatar: {
-          public_id: req.file.filename,
-          url: `/uploads/${req.file.filename}`,
+      // Delete previous avatar from Cloudinary if present
+      if (existUser && existUser.avatar && existUser.avatar.public_id) {
+        /* CLOUDINARY DELETE START - old user avatar */
+        try {
+          await deleteByPublicId(existUser.avatar.public_id);
+        } catch (err) {
+          console.error("Cloudinary delete error (update-avatar):", err);
+          // proceed even if deletion fails
+        }
+        /* CLOUDINARY DELETE END - old user avatar */
+      }
+
+      if (!req.file) return next(new ErrorHandler("No image provided", 400));
+
+      /* CLOUDINARY UPLOAD START - new user avatar */
+      let uploaded;
+      try {
+        uploaded = await uploadBuffer(req.file.buffer, "users");
+      } catch (err) {
+        console.error("Cloudinary upload error (update-avatar):", err);
+        return next(new ErrorHandler("Image upload failed", 500));
+      }
+      /* CLOUDINARY UPLOAD END - new user avatar */
+
+      const user = await User.findByIdAndUpdate(
+        req.user.id,
+        {
+          avatar: {
+            public_id: uploaded.public_id,
+            url: uploaded.secure_url,
+          },
         },
-      });
+        { new: true }
+      );
+
       res.status(200).json({ success: true, user });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));

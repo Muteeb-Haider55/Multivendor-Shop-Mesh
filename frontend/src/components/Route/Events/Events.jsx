@@ -9,7 +9,7 @@ const Events = () => {
   useEffect(() => {
     dispatch(getAllEvents());
   }, [dispatch]);
-  console.log(allEvents);
+
   return (
     <div>
       {!isLoading && (
@@ -18,7 +18,7 @@ const Events = () => {
             <h1>Popular Events</h1>
           </div>
           <div className=" w-full grid">
-            <EventCard data={allEvents && allEvents[3]} />
+            <EventCard data={allEvents && allEvents[0]} />
           </div>
         </div>
       )}

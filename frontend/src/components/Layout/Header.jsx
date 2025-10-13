@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
 
 import logo1 from "../../assets/logo123.png";
 
-import { categoriesData, productData } from "../../static/data.js";
+import { categoriesData } from "../../static/data.js";
 import { CgProfile } from "react-icons/cg";
 import Cart from "../../components/cart/Cart.jsx";
 import Wishlist from "../../components/wishlist/Wishlist.jsx";
@@ -51,13 +51,28 @@ const Header = ({ activeHeading }) => {
     setSearchData(filteredProducts);
   };
 
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 70) {
-      setActive(true);
+  // handle header active state on scroll
+  React.useEffect(() => {
+    const onScroll = () => {
+      if (window.scrollY > 70) setActive(true);
+      else setActive(false);
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // prevent body scroll when mobile menu is open
+  React.useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
     } else {
-      setActive(false);
+      document.body.style.overflow = "";
     }
-  });
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+  console.log(user);
 
   return (
     <>
@@ -88,7 +103,7 @@ const Header = ({ activeHeading }) => {
                     <Link to={`/products/${i._id}`} key={index}>
                       <div className="w-full flex items-start-py-3">
                         <img
-                          src={`${backend_url}/${i.images[0]}`}
+                          src={i.images[0].url}
                           alt=""
                           className="w-[40px] h-[40px]"
                         />
@@ -105,7 +120,7 @@ const Header = ({ activeHeading }) => {
               <Link to="/dashboard">
                 <div className={`${styles.button} m-auto !rounded-[4px]`}>
                   <h1 className=" text-[#fff] flex items-center">
-                    Go DashBoard
+                    Seller Dashboard
                     <IoIosArrowForward className="ml-1" />
                   </h1>
                 </div>
@@ -187,7 +202,7 @@ const Header = ({ activeHeading }) => {
                 {isAuthenticated ? (
                   <Link to="/profile">
                     <img
-                      src={`${backend_url}/${user?.avatar?.public_id}`}
+                      src={user?.avatar.url}
                       alt=""
                       className=" w-[35px] h-[35px] rounded-full"
                     />
@@ -209,25 +224,21 @@ const Header = ({ activeHeading }) => {
         </div>
       </div>
       {/* Mobile Header */}
-      <div className=" w-full h-[60px] fixed bg-[#fff] z-50 top-0 left-0 shadow-sm 800px:hidden">
-        <div className=" w-full flex items-center justify-between">
-          <div className=" relative ml-4">
+
+      <div className="w-full h-[60px] fixed bg-[#fff] z-50 top-0 left-0 shadow-sm md:hidden">
+        <div className="w-full flex items-center justify-between">
+          <div className="relative ml-4">
             <AiOutlineShoppingCart size={30} />
-            <span className=" absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 p-0 m-0 text-white font-nano text-[12px] leading-tight text-center">
+            <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 p-0 m-0 text-white font-nano text-[12px] leading-tight text-center">
               {cart && cart.length}
             </span>
           </div>
-          <div className=" ">
+          <div>
             <Link to="/">
-              <img
-                src={logo1}
-                alt="logo"
-                className="ml-6 h-[60px]
-            "
-              />
+              <img src={logo1} alt="logo" className="ml-6 h-[60px]" />
             </Link>
           </div>
-          <div className="">
+          <div>
             <BiMenuAltRight
               size={40}
               className="mr-4 cursor-pointer"
@@ -235,26 +246,27 @@ const Header = ({ activeHeading }) => {
             />
           </div>
         </div>
-        {/* Header sidebar */}
 
+        {/* Header sidebar */}
         {open && (
-          <div className=" fixed  w-full bg-[#0000005f] z-20 h-full top-0 right-0">
-            <div className=" fixed w-[60%] h-screen top-0 right-0 z-10 bg-white overflow-y-scroll">
-              <div className=" w-full justify-between flex pr-3">
-                <div className=" relative mr-[15px]">
-                  <AiOutlineHeart className=" mt-5 ml-3" size={30} />{" "}
-                  <span className=" absolute right-0 top-5 rounded-full bg-[#3bc177] w-4 h-4 p-0 m-0 text-white font-nano text-[12px] leading-tight text-center">
-                    0
+          <div className="fixed w-full bg-[#0000005f] z-20 h-full top-0 right-0">
+            <div className="fixed w-[60%] h-screen top-0 right-0 z-10 bg-white overflow-y-scroll">
+              <div className="w-full justify-between flex pr-3">
+                <div className="relative mr-[15px]">
+                  <AiOutlineHeart className="mt-5 ml-3" size={30} />
+                  <span className="absolute right-0 top-5 rounded-full bg-[#3bc177] w-4 h-4 p-0 m-0 text-white font-nano text-[12px] leading-tight text-center">
+                    {wishlist?.length || 0}
                   </span>
                 </div>
 
                 <RxCross1
                   size={25}
-                  className=" mt-5"
+                  className="mt-5 cursor-pointer"
                   onClick={() => setOpen(false)}
                 />
               </div>
 
+              {/* Search Box */}
               <div className="relative my-8 w-[92%] m-auto h-[40px]">
                 <input
                   type="text"
@@ -263,41 +275,17 @@ const Header = ({ activeHeading }) => {
                   onChange={handleSearchChange}
                   className="h-[40px] w-full px-2 border-green-600 border-[2px] rounded-md"
                 />
-                {searchData && searchData.length !== 0 ? (
-                  <div className=" absolute min-h-[30vh] bg-slate-50 shadow-sm-2  z-[9] p-4">
-                    {searchData.map((i, index) => {
-                      const d = i.name;
-                      const Product_name = d.replace(/\s+/g, "-");
-                      return (
-                        <Link
-                          key={index}
-                          to={`/products/${Product_name}`}
-                          onClick={() => {
-                            setOpen(false);
-                            setSearchTerm("");
-                            setSearchData(null);
-                          }}
-                        >
-                          <div className="w-full flex items-start-py-3">
-                            <img
-                              src={i.image_Url[0].url}
-                              alt=""
-                              className="w-[40px] h-[40px]"
-                            />
-                            <h1>{i.name}</h1>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                ) : null}
               </div>
+
+              {/* Navbar links */}
               <Navbar active={activeHeading} />
+
+              {/* Seller / Login Buttons */}
               {isSeller ? (
                 <Link to="/dashboard">
                   <div className={`${styles.button} m-auto !rounded-[4px]`}>
-                    <h1 className=" text-[#fff] flex items-center">
-                      Go DashBoard
+                    <h1 className="text-[#fff] flex items-center">
+                      Go Dashboard
                       <IoIosArrowForward className="ml-1" />
                     </h1>
                   </div>
@@ -305,19 +293,18 @@ const Header = ({ activeHeading }) => {
               ) : (
                 <Link to="/shop-create">
                   <div className={`${styles.button} m-auto !rounded-[4px]`}>
-                    <h1 className=" text-[#fff] flex items-center">
+                    <h1 className="text-[#fff] flex items-center">
                       Become Seller
                       <IoIosArrowForward className="ml-1" />
                     </h1>
                   </div>
                 </Link>
               )}
+
               <br />
 
-              <div
-                className="flex w-full justify-center
-              "
-              >
+              {/* Profile Section */}
+              <div className="flex w-full justify-center">
                 {!isAuthenticated ? (
                   <>
                     <Link
@@ -328,7 +315,7 @@ const Header = ({ activeHeading }) => {
                     </Link>
                     <Link
                       to="/sign-up"
-                      className="text-[18px]  text-[#000000b7]"
+                      className="text-[18px] text-[#000000b7]"
                     >
                       Sign up
                     </Link>
@@ -336,9 +323,9 @@ const Header = ({ activeHeading }) => {
                 ) : (
                   <Link to="/profile">
                     <img
-                      src={`${backend_url}/${user?.avatar?.public_id}`}
+                      src={user?.avatar?.url}
                       alt=""
-                      className=" w-[50px] h-[50px] rounded-full border-[3px] border-green-400"
+                      className="w-[50px] h-[50px] rounded-full border-[3px] border-green-400"
                     />
                   </Link>
                 )}

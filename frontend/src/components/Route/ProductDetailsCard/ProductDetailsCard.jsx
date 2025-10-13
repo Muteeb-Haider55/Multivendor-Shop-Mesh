@@ -78,7 +78,9 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                 <img
                   src={
                     data.images && data.images[0]
-                      ? `${backend_url}/${data.images[0]}`
+                      ? typeof data.images[0] === "string"
+                        ? `${backend_url}/${data.images[0]}`
+                        : data.images[0].url
                       : ""
                   }
                   alt=""

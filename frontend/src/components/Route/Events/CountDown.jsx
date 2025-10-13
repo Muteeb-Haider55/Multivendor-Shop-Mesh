@@ -26,11 +26,11 @@ const CountDown = ({ data }) => {
       return null;
     }
     return (
-      <div key={interval} className="  items-center mx-2">
-        <span className="text-[25px] font-bold text-blue-600 rounded-lg px-2">
+      <div key={interval} className="  items-center mx-2 ">
+        <span className="800px:text-[25px] font-bold text-blue-600 rounded-lg 800px:px-2 ">
           {timeLeft[interval].toString().padStart(2, "0")}
         </span>
-        <span className=" text-[25px] text-gray-600 capitalize">
+        <span className=" 800px:text-[25px] text-gray-600 capitalize">
           {interval}
         </span>
       </div>

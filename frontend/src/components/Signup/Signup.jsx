@@ -9,7 +9,8 @@ import { toast } from "react-toastify";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const config = { headers: { "Content-Type": "multipart/form-data" } };
+  // Do not set Content-Type header manually; axios/browser will set multipart boundary automatically
+  const config = null;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -25,7 +26,7 @@ const Signup = () => {
     e.preventDefault();
 
     const newForm = new FormData();
-    newForm.append("file", avatar);
+    if (avatar) newForm.append("file", avatar);
     newForm.append("name", name);
     newForm.append("email", email);
     newForm.append("password", password);
@@ -36,7 +37,8 @@ const Signup = () => {
         setName("");
         setEmail("");
         setPassword("");
-        setAvatar();
+        setAvatar(null);
+        navigate("/login");
       })
       .catch((err) => {
         toast.error(err.response.data.message);
@@ -146,7 +148,7 @@ const Signup = () => {
                   <span>Upload a file</span>
                   <input
                     type="file"
-                    name="avatar"
+                    name="file"
                     id="file-input"
                     accept=".jpg,.jpeg,.png"
                     onChange={handleFileInputChange}

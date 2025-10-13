@@ -75,17 +75,25 @@ const ProductDetails = ({ data }) => {
     }
   }, [wishlist]);
 
-  const totalReviewsLength =
-    products &&
-    products.reduce((acc, product) => acc + product.reviews.length, 0);
-  const totalRatings =
-    products &&
-    products.reduce(
-      (acc, product) =>
-        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
-      0
-    );
-  const averageRating = totalRatings / totalReviewsLength || 0;
+  const totalReviewsLength = products
+    ? products.reduce((acc, product) => acc + (product.reviews?.length || 0), 0)
+    : 0;
+  const totalRatings = products
+    ? products.reduce(
+        (acc, product) =>
+          acc +
+          (product.reviews
+            ? product.reviews.reduce(
+                (sum, review) => sum + (review.rating || 0),
+                0
+              )
+            : 0),
+        0
+      )
+    : 0;
+  const averageRating = totalReviewsLength
+    ? totalRatings / totalReviewsLength
+    : 0;
 
   const handleMessageSubmit = async () => {
     console.log(isAuthenticated);
@@ -121,25 +129,37 @@ const ProductDetails = ({ data }) => {
             <div className="block w-full 800px:flex">
               <div className=" w-full 800px:w-[50%]">
                 <img
-                  src={`${backend_url}/${data && data.images[select]}`}
+                  src={
+                    data?.images && data.images[select]
+                      ? typeof data.images[select] === "string"
+                        ? `${backend_url}/${data.images[select]}`
+                        : data.images[select].url
+                      : ""
+                  }
                   alt=""
                   className="p-4 rounded-[23px]"
                 />
                 <div className="w-full flex">
-                  {data &&
-                    data.images.map((i, index) => (
-                      <div
-                        className={`${
-                          select === 0 ? "border" : "null"
-                        } cursor-pointer`}
-                      >
-                        <img
-                          src={`${backend_url}/${i}`}
-                          className="h-[200px] overflow-hidden mr-3 mt-3"
-                          onClick={() => setSelect(index)}
-                        />
-                      </div>
-                    ))}
+                  {data?.images?.map((i, index) => (
+                    <div
+                      key={index}
+                      className={`${
+                        select === index ? "border" : "null"
+                      } cursor-pointer`}
+                    >
+                      <img
+                        src={
+                          i
+                            ? typeof i === "string"
+                              ? `${backend_url}/${i}`
+                              : i.url
+                            : ""
+                        }
+                        className="h-[200px] overflow-hidden mr-3 mt-3"
+                        onClick={() => setSelect(index)}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className=" w-full 800px:w-[50%] pt-5">
@@ -306,25 +326,24 @@ const ProductDetailsInfo = ({
       ) : null}
       {active === 2 ? (
         <div className=" w-full  flex flex-col items-center min-h-[40vh] overflow-y-scroll  py-3">
-          {data &&
-            data.reviews.map((item, index) => (
-              <div className=" w-full flex my-2">
-                <img
-                  src={`${backend_url}/${item.user.avatar}`}
-                  alt=""
-                  className=" w-[50px] h-[50px] rounded-full "
-                />
-                <div>
-                  <div className=" w-full flex items-center ">
-                    <h1 className=" pl-2 font-[500] mr-3">{item.user.name}</h1>
-                    <Rating ratings={data?.ratings} />
-                  </div>
-                  <p className="pl-2">{item.comment}</p>
+          {data?.reviews?.map((item, index) => (
+            <div className=" w-full flex my-2">
+              <img
+                src={item?.user?.avatar.url}
+                alt=""
+                className=" w-[50px] h-[50px] rounded-full "
+              />
+              <div>
+                <div className=" w-full flex items-center ">
+                  <h1 className=" pl-2 font-[500] mr-3">{item.user.name}</h1>
+                  <Rating ratings={data?.ratings} />
                 </div>
+                <p className="pl-2">{item.comment}</p>
               </div>
-            ))}
+            </div>
+          ))}
           <div className=" w-full flex justify-center">
-            {data && data.reviews.length === 0 && (
+            {(!data?.reviews || data.reviews.length === 0) && (
               <h5>No Review for this product</h5>
             )}
           </div>
@@ -335,7 +354,7 @@ const ProductDetailsInfo = ({
           <div className=" w-full 800px:w-[50%]">
             <div className=" flex items-center">
               <img
-                src={`${backend_url}/${data?.shop?.avatar}`}
+                src={data?.shop?.avatar.url}
                 alt=""
                 className=" w-[50px] h-[50px] rounded-full"
               />
@@ -362,13 +381,13 @@ const ProductDetailsInfo = ({
               </h5>
               <h5 className="font-[600] pt-3">
                 Total Products :
-                <span className=" font-[500]">{products.length}</span>
+                <span className=" font-[500]">{products?.length}</span>
               </h5>
               <h5 className="font-[600] pt-3">
                 Total Reviews:{" "}
                 <span className=" font-[500]">{totalReviewsLength}</span>
               </h5>
-              <Link to="/">
+              <Link to={`/shop/preview/${data?.shop?._id}`}>
                 <div
                   className={`${styles.button} !rounded-[4px] !h-[39.5px] mt-3`}
                 >

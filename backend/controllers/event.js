@@ -8,6 +8,7 @@ const { upload } = require("../multer.js");
 const { isSeller } = require("../middlware/auth.js");
 const Event = require("../models/event.js");
 const fs = require("fs");
+const { uploadBuffer, deleteByPublicId } = require("../utils/cloudinary.js");
 // Create Event
 router.post(
   "/create-event",
@@ -19,10 +20,17 @@ router.post(
       if (!shop) {
         return next(new ErrorHandler("Invaid shop id", 400));
       } else {
-        const files = req.files;
-        const imageUrls = files.map((file) => `${file.filename}`);
+        const files = req.files || [];
+        const uploadedImages = [];
+        for (const file of files) {
+          const result = await uploadBuffer(file.buffer, "products");
+          uploadedImages.push({
+            public_id: result.public_id,
+            url: result.secure_url,
+          });
+        }
         const eventData = req.body;
-        eventData.images = imageUrls;
+        eventData.images = uploadedImages;
         eventData.shop = shop;
         const event = await Event.create(eventData);
         res.status(201).json({
@@ -60,16 +68,22 @@ router.delete(
     try {
       const eventId = req.params.id;
       const eventData = await Event.findById(eventId);
-      eventData.images.forEach((imageUrl) => {
-        const filename = imageUrl;
-        const filePath = `uploads/${filename}`;
 
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.log(err);
+      for (const img of eventData.images) {
+        if (img && img.public_id) {
+          try {
+            await deleteByPublicId(img.public_id);
+          } catch (err) {
+            console.error("Cloudinary delete error:", err);
           }
-        });
-      });
+        } else if (typeof img === "string") {
+          const filename = img;
+          const filePath = `uploads/${filename}`;
+          fs.unlink(filePath, (err) => {
+            if (err) console.log(err);
+          });
+        }
+      }
 
       const event = await Event.findByIdAndDelete(eventId);
       if (!event) {

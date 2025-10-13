@@ -7,6 +7,7 @@ const Shop = require("../models/shop.js");
 const { upload } = require("../multer.js");
 const { isSeller, isAuthenticated } = require("../middlware/auth.js");
 const fs = require("fs");
+const { uploadBuffer, deleteByPublicId } = require("../utils/cloudinary.js");
 const Order = require("../models/order.js");
 // Create Product
 router.post(
@@ -19,10 +20,18 @@ router.post(
       if (!shop) {
         return next(new ErrorHandler("Invaid shop id", 400));
       } else {
-        const files = req.files;
-        const imageUrls = files.map((file) => `${file.filename}`);
+        const files = req.files || [];
+        const uploadedImages = [];
+
+        // Upload each file buffer to Cloudinary under 'products' folder
+        for (const file of files) {
+          // multer memoryStorage provides buffer
+          const result = await uploadBuffer(file.buffer, "products");
+          uploadedImages.push({ public_id: result.public_id, url: result.secure_url });
+        }
+
         const productData = req.body;
-        productData.images = imageUrls;
+        productData.images = uploadedImages;
         productData.shop = shop;
         const product = await Product.create(productData);
         res.status(201).json({
@@ -61,16 +70,25 @@ router.delete(
       const productId = req.params.id;
 
       const productData = await Product.findById(productId);
-      productData.images.forEach((imageUrl) => {
-        const filename = imageUrl;
-        const filePath = `uploads/${filename}`;
 
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            console.log(err);
+      // Delete images from Cloudinary if public_id present, else attempt local unlink
+      for (const img of productData.images) {
+        if (img && img.public_id) {
+          try {
+            await deleteByPublicId(img.public_id);
+          } catch (err) {
+            console.error("Cloudinary delete error:", err);
           }
-        });
-      });
+        } else if (typeof img === "string") {
+          // legacy string filename
+          const filename = img;
+          const filePath = `uploads/${filename}`;
+          fs.unlink(filePath, (err) => {
+            if (err) console.log(err);
+          });
+        }
+      }
+
       const product = await Product.findByIdAndDelete(productId);
 
       if (!product) {

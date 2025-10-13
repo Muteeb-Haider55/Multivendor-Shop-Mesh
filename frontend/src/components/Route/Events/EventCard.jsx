@@ -31,12 +31,12 @@ const EventCard = ({ active, data }) => {
     >
       <div className=" w-full  lg:w-[50%] m-auto">
         <img
-          src={`${backend_url}/${data?.images[0]}`}
-          className="800px:w-[2000px] 800px:max-h-[450px] rounded-[20px] p-4"
+          src={data?.images[0].url}
+          className="800px:w-[2000px] 800px:max-h-[450px] rounded-[20px] p-4 w-[380px] h-[400px]"
           alt=""
         />
       </div>
-      <div className=" w-full lg:w-[50%] flex flex-col justify-center">
+      <div className="  lg:w-[50%] flex flex-col justify-center ">
         <h2 className={`${styles.productTitle} `}> {data?.name}</h2>
         <p>{data?.description}</p>
         <div className="flex py-2 justify-between">
@@ -53,7 +53,7 @@ const EventCard = ({ active, data }) => {
               className=" ml-2
             "
             >
-              120 sold
+              {data?.sold_out} sold
             </span>
           </div>
         </div>

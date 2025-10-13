@@ -5,6 +5,7 @@ const ErrorHandler = require("../utils/ErrorHandler.js");
 const { isAuthenticated } = require("../middlware/auth.js");
 const { upload } = require("../multer.js");
 const router = express.Router();
+const { uploadBuffer } = require("../utils/cloudinary.js");
 
 // Create new message
 router.post(
@@ -13,11 +14,14 @@ router.post(
   catchAsyncErrors(async (req, res, next) => {
     try {
       const messageData = req.body;
-      if (req.files) {
+      if (req.files && req.files.length) {
         const files = req.files;
-        const imageUrls = files.map((file) => `${file.fileName}`);
-
-        messageData.images = imageUrls;
+        const uploaded = [];
+        for (const file of files) {
+          const result = await uploadBuffer(file.buffer, "products");
+          uploaded.push({ public_id: result.public_id, url: result.secure_url });
+        }
+        messageData.images = uploaded;
       }
       messageData.conversationId = req.body.conversationId;
       messageData.sender = req.body.sender;
@@ -26,7 +30,7 @@ router.post(
       const message = new Messages({
         conversationId: messageData.conversationId,
         sender: messageData.sender,
-        images: messageData.images ? messageData.images : [],
+  images: messageData.images ? messageData.images : [],
         text: messageData.text,
       });
 
