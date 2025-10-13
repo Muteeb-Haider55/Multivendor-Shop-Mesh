@@ -5,7 +5,7 @@ import styles from "../../styles/styles";
 import { categoriesData } from "../../static/data";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { toast } from "react-toastify";
-import { createEvent } from "../../redux/actions/event";
+import { createEvent, getAllEventsShop } from "../../redux/actions/event";
 
 const CreateEvent = () => {
   const { seller } = useSelector((state) => state.seller);
@@ -76,6 +76,8 @@ const CreateEvent = () => {
     if (success) {
       toast.success("Event Created SuccessFully");
       navigate("/dashboard-events");
+      dispatch(getAllEventsShop());
+      window.location.reload();
     }
   };
 

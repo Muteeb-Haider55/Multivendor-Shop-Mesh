@@ -3,9 +3,9 @@ const streamifier = require("streamifier");
 
 // Configure Cloudinary with provided credentials
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME || "dueo1tldn",
-  api_key: process.env.CLOUDINARY_API_KEY || "628548479715255",
-  api_secret: process.env.CLOUDINARY_API_SECRET || "sNVzT-YSCNNJkV9NcPwyb6U1e0E",
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 // Upload buffer to Cloudinary into given folder. Returns a Promise resolving to the upload result.

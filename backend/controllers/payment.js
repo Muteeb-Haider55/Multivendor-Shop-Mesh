@@ -1,13 +1,32 @@
+require("dotenv").config();
+
 const express = require("express");
 const catchAsyncErrors = require("../middlware/catchAsyncErrors");
 const router = express.Router();
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  try {
+    stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+  } catch (err) {
+    console.error("Stripe initialization error:", err.message || err);
+    stripe = null;
+  }
+} else {
+  console.warn(
+    "STRIPE_SECRET_KEY not set — payment routes will return an error until configured."
+  );
+}
 
 router.post(
   "/process",
   catchAsyncErrors(async (req, res, next) => {
     try {
+      if (!stripe) {
+        return res
+          .status(500)
+          .json({ success: false, message: "Stripe not configured on server" });
+      }
       const myPayment = await stripe.paymentIntents.create({
         amount: req.body.amount,
         currency: "usd",

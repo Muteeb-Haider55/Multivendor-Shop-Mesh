@@ -1,11 +1,10 @@
-import { validateProps } from "@mui/x-data-grid/internals";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styles from "../../styles/styles";
 import { categoriesData } from "../../static/data";
 import { AiOutlinePlusCircle } from "react-icons/ai";
-import { createProduct } from "../../redux/actions/product";
+import { createProduct, getAllProductsShop } from "../../redux/actions/product";
 import { toast } from "react-toastify";
 
 const CreateProduct = () => {
@@ -50,6 +49,7 @@ const CreateProduct = () => {
     if (success === true) {
       toast.success("Product created successfully");
       navigate("/dashboard-products");
+      dispatch(getAllProductsShop());
     }
   };
 
