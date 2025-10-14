@@ -10,6 +10,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "https://shop-mesh.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
