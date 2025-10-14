@@ -1,7 +1,7 @@
 import React from "react";
 import DashboardHeader from "../../components/shop/Layout/DashboardHeader";
 import DashboardSideBar from "../../components/shop/Layout/DashboardSideBar";
-import AllRefundOrders from "../../components/Shop/AllRefundOrders.jsx";
+import AllRefundOrders from "../../components/shop/AllRefundOrders.jsx";
 
 const ShopAllRefunds = () => {
   return (
