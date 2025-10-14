@@ -17,18 +17,18 @@ app.use("/", express.static("uploads"));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 // Add test route before creating server
-// app.get("/api/test", (req, res) => {
-//   res.status(200).json({
-//     success: true,
-//     message: "API is working!",
-//     timestamp: new Date().toISOString(),
-//   });
-// });
+app.get("/api/test", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "API is working!",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 //config
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({
-    path: "backend/config/.env",
+    path: "config/.env",
   });
 }
 
