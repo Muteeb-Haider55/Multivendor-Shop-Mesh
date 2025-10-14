@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 
 const Signup = () => {
   const navigate = useNavigate();
-  // Do not set Content-Type header manually; axios/browser will set multipart boundary automatically
   const config = null;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

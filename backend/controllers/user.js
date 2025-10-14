@@ -41,7 +41,7 @@ router.post("/create-user", upload.single("file"), async (req, res, next) => {
       avatar: avatar,
     };
     const activationToken = createActivationToken(user);
-    const activationUrl = `http://localhost:5173/activation/${activationToken}`;
+    const activationUrl = `https://shop-mesh.vercel.app/activation/${activationToken}`;
     try {
       await sendMail({
         email: user.email,
