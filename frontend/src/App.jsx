@@ -248,7 +248,7 @@ const App = () => {
             path="/dashboard-messages"
             element={
               <SellerProtectedRoute>
-                <ShopInboxPage />
+                <ShopInboaxPage />
               </SellerProtectedRoute>
             }
           />

@@ -1,7 +1,7 @@
 import React from "react";
 import DashboardHeader from "../../components/shop/Layout/DashboardHeader";
 import DashboardSideBar from "../../components/shop/Layout/DashboardSideBar";
-import AllCoupounsCodes from "../../components/Shop/AllCoupounsCodes.jsx";
+import AllCoupounsCodes from "../../components/shop/AllCoupounsCodes.jsx";
 
 const ShopAllCoupouns = () => {
   return (
