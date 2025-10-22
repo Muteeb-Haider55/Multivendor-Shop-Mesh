@@ -190,7 +190,7 @@ router.put(
 );
 // accept the refund ===seller
 router.put(
-  "order-refund-success/:id",
+  "/order-refund-success/:id",
   isSeller,
   catchAsyncErrors(async (req, res, next) => {
     try {
