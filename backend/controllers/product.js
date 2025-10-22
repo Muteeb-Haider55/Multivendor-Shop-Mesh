@@ -27,7 +27,10 @@ router.post(
         for (const file of files) {
           // multer memoryStorage provides buffer
           const result = await uploadBuffer(file.buffer, "products");
-          uploadedImages.push({ public_id: result.public_id, url: result.secure_url });
+          uploadedImages.push({
+            public_id: result.public_id,
+            url: result.secure_url,
+          });
         }
 
         const productData = req.body;
@@ -69,35 +72,41 @@ router.delete(
     try {
       const productId = req.params.id;
 
-      const productData = await Product.findById(productId);
+        const productData = await Product.findById(productId);
 
-      // Delete images from Cloudinary if public_id present, else attempt local unlink
-      for (const img of productData.images) {
-        if (img && img.public_id) {
-          try {
-            await deleteByPublicId(img.public_id);
-          } catch (err) {
-            console.error("Cloudinary delete error:", err);
-          }
-        } else if (typeof img === "string") {
-          // legacy string filename
-          const filename = img;
-          const filePath = `uploads/${filename}`;
-          fs.unlink(filePath, (err) => {
-            if (err) console.log(err);
-          });
+        if (!productData) {
+          return next(new ErrorHandler("Product not found", 404));
         }
-      }
 
-      const product = await Product.findByIdAndDelete(productId);
+        // Ensure the authenticated seller owns this product
+        if (!req.seller || String(req.seller._id) !== String(productData.shopId)) {
+          return next(new ErrorHandler("Not authorized to delete this product", 403));
+        }
 
-      if (!product) {
-        return next(new ErrorHandler("product not fount with this is", 500));
-      }
-      res.status(201).json({
-        success: true,
-        message: "Product deleted Successfully",
-      });
+        // Delete images from Cloudinary if public_id present
+        if (Array.isArray(productData.images)) {
+          for (const img of productData.images) {
+            if (img && img.public_id) {
+              try {
+                await deleteByPublicId(img.public_id);
+              } catch (err) {
+                // log and continue; don't block deletion if a cloudinary delete fails
+                console.error("Cloudinary delete error:", err);
+              }
+            }
+          }
+        }
+
+        const product = await Product.findByIdAndDelete(productId);
+
+        if (!product) {
+          return next(new ErrorHandler("Product not found or already deleted", 404));
+        }
+
+        res.status(200).json({
+          success: true,
+          message: "Product deleted Successfully",
+        });
     } catch (error) {
       return next(new ErrorHandler(error, 400));
     }
