@@ -69,27 +69,37 @@ router.delete(
       const eventId = req.params.id;
       const eventData = await Event.findById(eventId);
 
-      for (const img of eventData.images) {
-        if (img && img.public_id) {
-          try {
-            await deleteByPublicId(img.public_id);
-          } catch (err) {
-            console.error("Cloudinary delete error:", err);
+      if (!eventData) {
+        return next(new ErrorHandler("Event not found", 404));
+      }
+
+      // Ensure the authenticated seller owns this event
+      if (!req.seller || String(req.seller._id) !== String(eventData.shopId)) {
+        return next(
+          new ErrorHandler("Not authorized to delete this event", 403)
+        );
+      }
+
+      // Delete images from Cloudinary if public_id present
+      if (Array.isArray(eventData.images)) {
+        for (const img of eventData.images) {
+          if (img && img.public_id) {
+            try {
+              await deleteByPublicId(img.public_id);
+            } catch (err) {
+              console.error("Cloudinary delete error:", err);
+            }
           }
-        } else if (typeof img === "string") {
-          const filename = img;
-          const filePath = `uploads/${filename}`;
-          fs.unlink(filePath, (err) => {
-            if (err) console.log(err);
-          });
         }
       }
 
       const event = await Event.findByIdAndDelete(eventId);
       if (!event) {
-        return next(new ErrorHandler("product not fount with this is", 500));
+        return next(
+          new ErrorHandler("Event not found or already deleted", 404)
+        );
       }
-      res.status(201).json({
+      res.status(200).json({
         success: true,
         message: "Event deleted Successfully",
       });
