@@ -27,7 +27,7 @@ const DashboardHero = () => {
       setDeliveredOrders(orderData);
     }
   }, [orders]);
-  console.log(deliveredOrders);
+
   const totalEarningWithoutTax =
     deliveredOrders &&
     deliveredOrders.reduce((acc, item) => acc + item.totalPrice, 0);

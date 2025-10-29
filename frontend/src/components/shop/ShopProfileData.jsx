@@ -20,9 +20,10 @@ const ShopProfileData = ({ isOwner }) => {
     dispatch(getAllProductsShop(id));
     dispatch(getAllEventsShop(seller._id));
   }, [dispatch]);
+
   const allReviews =
     products && products.map((product) => product.reviews).flat();
-  console.log(events);
+
   return (
     <div className=" w-full ">
       <div className=" w-full flex items-center justify-between ">
@@ -99,10 +100,11 @@ const ShopProfileData = ({ isOwner }) => {
             allReviews.map((item, index) => (
               <div className=" w-full flex my-3">
                 <img
-                  src={`${backend_url}/${item.user.avatar.public_id}`}
+                  src={item.user.avatar.url}
                   className="w-[50px] h-[50px] rounded-full"
                   alt=""
                 />
+
                 <div className="pl-2">
                   <div className=" w-full flex items-center">
                     <h1 className="font-[600] pr-2">{item.user.name}</h1>

@@ -89,11 +89,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                 <div className="flex">
                   <Link to={`/shop/preview/${data?.shop?._id}`}>
                     <img
-                      src={`${
-                        data.shop && data.shop.avatar
-                          ? `${backend_url}/${data.shop.avatar}`
-                          : ""
-                      }`}
+                      src={data.shop && data.shop.avatar.url}
                       className=" w-[50px] h-[50px] rounded-full mr-2 "
                       alt=""
                     />
@@ -102,9 +98,6 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                     <h3 className={`${styles.shop_name}`}>
                       {data.shop.shop_name}
                     </h3>
-                    <h5 className=" pb-3 text-[15px]">
-                      ({data.shop.ratings}) Ratings
-                    </h5>
                   </div>
                 </div>
                 <div

@@ -74,6 +74,7 @@ const OrderDetails = () => {
     const currentIndex = statusList.indexOf(currentStatus);
     return currentIndex !== -1 ? statusList.slice(currentIndex) : statusList;
   };
+  console.log("helllo");
 
   return (
     <div className={`${styles.section}`}>
@@ -110,6 +111,7 @@ const OrderDetails = () => {
             alt={item.name}
             className="w-[80px] h-[80px] object-cover"
           />
+
           <div className="w-full">
             <h5 className="pl-3 text-[20px] font-medium">{item.name}</h5>
             <h5 className="pl-3 text-[18px] text-gray-600">
