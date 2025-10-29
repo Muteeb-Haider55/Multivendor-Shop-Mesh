@@ -3,6 +3,7 @@ import styles from "../../../styles/styles";
 import EventCard from "./EventCard.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllEvents } from "../../../redux/actions/event.js";
+import Loader from "../../Layout/Loader.jsx";
 const Events = () => {
   const { allEvents, isLoading } = useSelector((state) => state.events);
   const dispatch = useDispatch();
@@ -10,18 +11,18 @@ const Events = () => {
     dispatch(getAllEvents());
   }, [dispatch]);
 
+  if (isLoading) return <Loader />;
+
   return (
     <div>
-      {!isLoading && (
-        <div className={`${styles.section}`}>
-          <div className={`${styles.heading}`}>
-            <h1>Popular Events</h1>
-          </div>
-          <div className=" w-full grid">
-            <EventCard data={allEvents && allEvents[0]} />
-          </div>
+      <div className={`${styles.section}`}>
+        <div className={`${styles.heading}`}>
+          <h1>Popular Events</h1>
         </div>
-      )}
+        <div className=" w-full grid">
+          <EventCard data={allEvents && allEvents[0]} />
+        </div>
+      </div>
     </div>
   );
 };

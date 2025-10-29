@@ -21,6 +21,7 @@ import Navbar from "./Navbar.jsx";
 import { useSelector } from "react-redux";
 import { backend_url } from "../../../server.js";
 import { RxCross1 } from "react-icons/rx";
+import Breadcrumb from "./Breadcrumb.jsx";
 
 const Header = ({ activeHeading }) => {
   const { allProducts } = useSelector((state) => state.product);
@@ -344,6 +345,10 @@ const Header = ({ activeHeading }) => {
           </div>
         )}
       </div>
+      {/* Breadcrumb navigation: shows path like Home / Products / Item
+          Added here so every page that renders Header gets a consistent breadcrumb
+          Why: improves navigation and discoverability for users, especially on nested pages */}
+      <Breadcrumb />
     </>
   );
 };

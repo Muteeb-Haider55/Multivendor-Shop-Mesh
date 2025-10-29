@@ -13,7 +13,7 @@ const EventsPage = () => {
   useEffect(() => {
     dispatch(getAllEvents());
   }, [dispatch]);
-  console.log(allEvents);
+
   return (
     <>
       {isLoading ? (

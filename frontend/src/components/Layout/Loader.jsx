@@ -1,19 +1,20 @@
 import React from "react";
-import Lottie from "react-lottie";
-import animationData from "../../assets/animations/24151-ecommerce-animation.json";
 
-const Loader = () => {
-  const defaultOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
+// Simple green spinner loader
+
+const Loader = ({ fullScreen = true, size = "w-12 h-12" }) => {
+  const containerClass = fullScreen
+    ? "w-full h-screen flex items-center justify-center"
+    : "flex items-center justify-center";
+
   return (
-    <div className=" w-full h-screen items-center justify-center">
-      <Lottie options={defaultOptions} width={300} height={300} />
+    <div className={containerClass}>
+      <div
+        // Tailwind spinner: green border with transparent top to create the spin illusion
+        className={`border-4 border-green-400 border-t-transparent rounded-full animate-spin ${size}`}
+        aria-label="Loading"
+        role="status"
+      />
     </div>
   );
 };
