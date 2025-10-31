@@ -20,7 +20,7 @@ const AllRefundOrders = () => {
     orders && orders.filter((item) => item.status === "processing refund");
 
   const columns = [
-    { field: "id", headerName: "Order ID", minWidth: 30, flex: 0.1 },
+    { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.1 },
 
     {
       field: "status",
@@ -35,7 +35,7 @@ const AllRefundOrders = () => {
       field: "itemsQty",
       headerName: "Items Qty",
       type: "number",
-      minWidth: 10,
+      minWidth: 130,
       flex: 0.1,
     },
 
@@ -44,13 +44,13 @@ const AllRefundOrders = () => {
       headerName: "Total",
       type: "number",
       minWidth: 30,
-      flex: 0.1,
+      flex: 0.7,
     },
 
     {
       field: "action",
-      flex: 0.1,
-      minWidth: 10,
+      flex: 1,
+      minWidth: 150,
       headerName: "",
       type: "number",
       sortable: false,
@@ -84,7 +84,7 @@ const AllRefundOrders = () => {
       {isLoading ? (
         <Loader />
       ) : (
-        <div className="w-full mx-8 pt-1 mt-10 bg-white">
+        <div className="pl-8 pt-1">
           <DataGrid
             rows={row}
             columns={columns}

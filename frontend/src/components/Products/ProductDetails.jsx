@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { addToCart } from "../../redux/actions/cart";
 import Rating from "./Rating";
 import axios from "axios";
+import Breadcrumb from "../Layout/Breadcrumb";
 
 const ProductDetails = ({ data }) => {
   const { allProducts } = useSelector((state) => state.product);
@@ -123,6 +124,7 @@ const ProductDetails = ({ data }) => {
   };
   return (
     <div className=" bg-white ">
+      <Breadcrumb />
       {data ? (
         <div className={`${styles.section} w-[90%] 800px:w-[80%]`}>
           <div className=" w-full py-5 ">

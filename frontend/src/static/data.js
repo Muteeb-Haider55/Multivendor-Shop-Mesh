@@ -876,13 +876,14 @@ export const categoriesData = [
     title: "Gifts",
     subTitle: "",
     image_Url:
-      "https://securecdn.pymnts.com/wp-content/uploads/2014/11/Gifts-Photo-700x489.jpg",
+      "https://media.istockphoto.com/id/2220886982/photo/isolated-gold-gift-wrapped-with-brown-ribbon.webp?a=1&b=1&s=612x612&w=0&k=20&c=wNG5SZWItc0hwxcE5M-0QaBQLku6jGbkdsgr3Lwl7jQ=",
   },
   {
     id: 7,
     title: "Pet Care",
     subTitle: "",
-    image_Url: "https://cdn.openpr.com/T/c/Tc15444071_g.jpg",
+    image_Url:
+      "https://media.istockphoto.com/id/2172322479/photo/orange-cat-isolated-on-white-background-with-clipping-part-for-graphic-design.webp?a=1&b=1&s=612x612&w=0&k=20&c=SvM6l7-zNOQnjyb96w_ZwnYDkTR3FbITjB8jwFmhbus=",
   },
   {
     id: 8,

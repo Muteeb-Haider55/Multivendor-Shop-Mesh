@@ -3,6 +3,7 @@ import Header from "../components/Layout/Header.jsx";
 import styles from "../styles/styles.js";
 import ProfileSidebar from "../components/Profile/ProfileSidebar.jsx";
 import ProfileContent from "../components/Profile/ProfileContent.jsx";
+import Breadcrumb from "../components/Layout/Breadcrumb.jsx";
 const ProfilePage = () => {
   const [active, setActive] = useState(1);
   return (
